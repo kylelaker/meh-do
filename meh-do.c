@@ -1,17 +1,49 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+
+/*
+ * Adds various sbin directories to the path so that executables in those
+ * directories can be called by meh-do.
+ *
+ * Returns 0 on success, or any other integer on failure.
+ */
+int add_sbin_to_path() {
+    char *sbin_str = "/sbin:/usr/sbin:/usr/local/sbin:";
+    char *curr_path = getenv("PATH");
+    if (curr_path == NULL) {
+        return 1;
+    }
+    size_t path_len = strlen(curr_path) + strlen(sbin_str);
+    char new_path[path_len];
+    memset(new_path, 0, path_len);
+    strcat(new_path, sbin_str);
+    strcat(new_path, curr_path);
+    return setenv("PATH", new_path, 1);
+}
 
 int main (int argc, char **argv)
 {
+    add_sbin_to_path();
+
+    /* If the user didn't specify any arguments, open a login shell */
     if (argc < 2) {
-        fprintf(stderr, "Insufficient arguments provided\n");
-        return 1;
-    }
-    if (execvp(argv[1], argv+1) < 0) {
-        if (execv(argv[1], argv+1) < 0) {
-            fprintf(stderr, "Unable to run %s\n", argv[1]);
-            return 2;
+        char *shell = getenv("SHELL");
+        if (shell == NULL) {
+            shell = "sh";
         }
+        char *shell_args[] = { shell, "-l", NULL };
+        if (execvp(shell_args[0], shell_args) != 0) {
+            fprintf(stderr, "Unable to execute %s\n", shell[1]);
+            return 1;
+        }
+    }
+
+    /* Run the command provided */
+    if (execvp(argv[1], argv+1) != 0) {
+        fprintf(stderr, "Unable to execute %s\n", argv[1]);
+        return 1;
     }
 }
 
