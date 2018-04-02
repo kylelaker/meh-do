@@ -12,6 +12,10 @@ PREFIX=/usr/local
 .PHONY: default
 default: all
 
+.PHONY: debug
+debug: CFLAGS += -g -O0
+debug: all
+
 .PHONY: all
 all: $(EXE)
 
