@@ -20,8 +20,8 @@ int add_sbin_to_path() {
     size_t path_len = strlen(curr_path) + strlen(sbin_str);
     char new_path[path_len];
     memset(new_path, 0, path_len);
-    strcat(new_path, sbin_str);
-    strcat(new_path, curr_path);
+    strncat(new_path, sbin_str, strlen(sbin_str));
+    strncat(new_path, curr_path, strlen(curr_path));
     return setenv("PATH", new_path, 1);
 }
 
