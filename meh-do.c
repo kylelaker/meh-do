@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define DEFAULT_SHELL "sh"
+
 /*
  * Adds various sbin directories to the path so that executables in those
  * directories can be called by meh-do.
@@ -27,22 +29,23 @@ int main (int argc, char **argv)
 {
     add_sbin_to_path();
 
+    /*
+     * We should start looking at arguments after arg[0]
+     */
+    char **exec_args = (argv + 1);
+
     /* If the user didn't specify any arguments, open a login shell */
-    if (argc < 2) {
+    if (exec_args[0] == NULL) {
         char *shell = getenv("SHELL");
-        if (shell == NULL) {
-            shell = "sh";
-        }
-        char *shell_args[] = { shell, "-l", NULL };
-        if (execvp(shell_args[0], shell_args) != 0) {
-            fprintf(stderr, "Unable to execute %s\n", shell[1]);
-            return 1;
-        }
+        if (shell == NULL)
+            shell = DEFAULT_SHELL;
+
+        exec_args = (char*[]){ shell, "-l", NULL };
     }
 
     /* Run the command provided */
-    if (execvp(argv[1], argv+1) != 0) {
-        fprintf(stderr, "Unable to execute %s\n", argv[1]);
+    if (execvp(exec_args[0], exec_args) != 0) {
+        fprintf(stderr, "Unable to execute %s\n", exec_args[0]);
         return 1;
     }
 }
