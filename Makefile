@@ -8,6 +8,7 @@ MANSECTION=man1
 
 DESTDIR=
 PREFIX=/usr/local
+OWNER=root
 
 .PHONY: default
 default: all
@@ -32,5 +33,5 @@ install:
 	$(INSTALL) $(INSTALLFLAGS) $(EXE) $(DESTDIR)$(PREFIX)/bin/$(EXE)
 	mkdir -p $(DESTDIR)$(PREFIX)/man/$(MANSECTION)
 	$(INSTALL) $(EXE).1 $(DESTDIR)$(PREFIX)/man/$(MANSECTION)/$(EXE).1
-	chown root:root $(DESTDIR)$(PREFIX)/bin/$(EXE)
+	chown $(OWNER):$(OWNER) $(DESTDIR)$(PREFIX)/bin/$(EXE)
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(EXE)
