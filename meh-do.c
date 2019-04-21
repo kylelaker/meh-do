@@ -43,6 +43,8 @@ int main (int argc, char **argv)
         exec_args = (char*[]){ shell, "-l", NULL };
     }
 
+    setuid(0);
+
     /* Run the command provided */
     if (execvp(exec_args[0], exec_args) != 0) {
         fprintf(stderr, "Unable to execute %s\n", exec_args[0]);
